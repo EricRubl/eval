@@ -1,4 +1,5 @@
 #include <iostream>
+#include "DynamicStack.hpp"
 
 int main()
 {
