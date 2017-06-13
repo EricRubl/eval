@@ -29,12 +29,12 @@ namespace Eval
             delete _size;
         }
 
-        bool empty() const
+        bool empty() const noexcept
         {
             return first == nullptr;
         }
 
-        void push(stack_elem_t element)
+        void push(stack_elem_t element) noexcept
         {
             Node<stack_elem_t>* newNode = new Node<stack_elem_t>;
             newNode->element = element;
@@ -46,7 +46,7 @@ namespace Eval
             (*_size)++;
         }
 
-        void pop()
+        void pop() noexcept
         {
             if(this->empty())
                 return;
@@ -64,7 +64,7 @@ namespace Eval
                 return first->element;
         }
 
-        unsigned long long size() const
+        unsigned long long size() const noexcept
         {
             return (*_size);
         }

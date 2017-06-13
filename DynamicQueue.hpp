@@ -7,24 +7,45 @@
 
 namespace Eval
 {
-    template <typename queue_elem_t>
-    struct IndexNode
+    template <typename queue_elem_t, unsigned long long capacity = 50>
+    struct LinkedList
     {
-        queue_elem_t element;
-        unsigned long long next = 0;
+        queue_elem_t* data;
+        unsigned long long* next;
+
+        LinkedList() { data = new queue_elem_t[capacity]; next = new unsigned long long[capacity]; for(unsigned long long i(0); i < capacity; ++i) next[i] = 0; }
+        ~LinkedList() {delete[] data; delete[] next; }
+
+
+        void add(queue_elem_t element)
+        {
+            for(unsigned long long i(0); i < capacity; ++i)
+                if(next[i] == 0)
+                    if(i == 0){
+                        data[0] = element;
+                        next[0] = 1;
+                        break;
+                    }
+                    else
+                    {
+                        data[i] = element;
+                        next[i] = i + 1;
+                        break;
+                    }
+        }
     };
 
-    template <typename queue_elem_t, constexpr unsigned long long capacity>
+    template <typename queue_elem_t, unsigned long long capacity = 50>
     class DynamicQueue
     {
     private:
-        IndexNode<queue_elem_t>* nodes;
+        LinkedList<queue_elem_t, capacity> list;
         unsigned long long* _size;
     public:
-        DynamicQueue() { nodes = new IndexNode<queue_elem_t>[capacity]; _size = new unsigned long long(0); }
-        ~DynamicQueue() { delete nodes; delete _size; }
+        DynamicQueue() { _size = new unsigned long long(0); }
+        ~DynamicQueue() { delete _size; }
 
-        bool empty() const
+        bool empty() const noexcept
         {
             return (*_size) == 0;
         }
@@ -33,26 +54,24 @@ namespace Eval
         {
             if((*_size) == capacity)
                 throw "Queue is full!";
-            nodes[(*_size)].element = element;
-            if((*_size) > 0)
-                nodes[(*_size) - 1].next = (*_size);
+            list.add(element);
             (*_size)++;
         }
 
-        void pop()
+        void pop() noexcept
         {
             if(empty())
                 return;
-            for(unsigned long long i(0); nodes[i].next not_eq 0; ++i)
-                nodes[i].element = nodes[i + 1].element;
-            if((*_size) > 0)
-                nodes[(*_size) - 1].next = 0;
+            for(unsigned long long i(0); i < (*_size) - 1; ++i)
+                list.data[i] = list.data[i + 1];
+            if((*_size) == 1)
+                list.next[0] = 0;
             else
-                nodes[(*_size)].next = 0;
+                list.next[(*_size) - 2] = 0;
             (*_size)--;
         }
 
-        unsigned long long size() const
+        unsigned long long size() const noexcept
         {
             return (*_size);
         }
@@ -61,16 +80,7 @@ namespace Eval
         {
             if(empty())
                 throw "Queue is empty!";
-            return nodes[0].element;
-        }
-
-        queue_elem_t back() const
-        {
-            if(empty())
-                throw "Queue is empty!";
-            for(unsigned long long i(0); i < capacity; ++i)
-                if(nodes[i].next == 0)
-                    return nodes[i].element;
+            return list.data[0];
         }
     };
 }

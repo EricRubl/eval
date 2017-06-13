@@ -1,8 +1,23 @@
 #include <iostream>
-#include "DynamicStack.hpp"
+#include "Expression.hpp"
+#include <gtest/gtest.h>
 
-int main()
+int main(int argc, char* argv[])
 {
-    std::cout << "Hello, World!" << std::endl;
+    testing::InitGoogleTest(&argc, argv);
+    RUN_ALL_TESTS();
+    Eval::Expression ex;
+    try
+    {
+        std::cin >> ex;
+        ex.toPostfix();
+        std::cout << ex.eval();
+    }
+    catch(const char* ex)
+    {
+        std::cout << ex;
+    }
+
+    system("pause>nul");
     return 0;
 }
