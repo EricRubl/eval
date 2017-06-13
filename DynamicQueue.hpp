@@ -71,11 +71,6 @@ namespace Eval
             (*_size)--;
         }
 
-        unsigned long long size() const noexcept
-        {
-            return (*_size);
-        }
-
         queue_elem_t front() const
         {
             if(empty())

@@ -63,11 +63,6 @@ namespace Eval
             else
                 return first->element;
         }
-
-        unsigned long long size() const noexcept
-        {
-            return (*_size);
-        }
     };
 }
 

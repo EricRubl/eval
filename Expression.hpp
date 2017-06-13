@@ -33,6 +33,7 @@ namespace Eval
     public:
         DynamicQueue<int> infix;
         DynamicQueue<int> postfix;
+        DynamicQueue<int> backup;
     public:
         Expression() = default;
         ~Expression() = default;
@@ -91,6 +92,7 @@ namespace Eval
                 }
             if(number not_eq "")
                 exp.infix.push(std::stoi(number));
+            return input;
         }
 
         void toPostfix()
@@ -102,6 +104,7 @@ namespace Eval
                 if(token >= 0)
                 {
                     postfix.push(token);
+                    backup.push(token);
                     infix.pop();
                 }
                 else
@@ -116,6 +119,7 @@ namespace Eval
                         while(stack.top() not_eq (int)Operation::LEFT)
                         {
                             postfix.push(stack.top());
+                            backup.push(stack.top());
                             stack.pop();
                         }
                         stack.pop();
@@ -129,6 +133,7 @@ namespace Eval
                     else if(Priority(token) == Priority(stack.top()))
                     {
                         postfix.push(stack.top());
+                        backup.push(stack.top());
                         stack.pop();
                         stack.push(token);
                         infix.pop();
@@ -136,23 +141,25 @@ namespace Eval
                     else if(Priority(token) < Priority(stack.top()))
                     {
                         postfix.push(stack.top());
+                        backup.push(stack.top());
                         stack.pop();
 
                         if(stack.empty())
                             goto here;
                         while(Priority(token) < Priority(stack.top()))
                         {
-                            postfix.push(stack.top()); // mai usor cu ; galatan
+                            postfix.push(stack.top());
+                            backup.push(stack.top());
                             stack.pop();
                         }
                         if(Priority(token) == Priority(stack.top()))
                         {
                             postfix.push(stack.top());
+                            backup.push(stack.top());
                             stack.pop();
-                            stack.push(token);
                         }
                         else if(Priority(token) > Priority(stack.top()))
-                            stack.push(token);
+                            goto here;
                         here:
                         stack.push(token);
                         infix.pop();
@@ -162,6 +169,7 @@ namespace Eval
             while(not stack.empty())
             {
                 postfix.push(stack.top());
+                backup.push(stack.top());
                 stack.pop();
             }
         }
@@ -181,7 +189,7 @@ namespace Eval
                 {
                     auto temp = stack.top();
                     stack.pop();
-                    int res;
+                    int res = 0;
                     switch(token)
                     {
                         case -1:
